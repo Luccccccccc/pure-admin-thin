@@ -12,7 +12,6 @@ import {
 } from "vue-router";
 import {
   ascending,
-  getTopMenu,
   initRouter,
   isOneOfArray,
   getHistoryMode,
@@ -96,14 +95,13 @@ export function resetRouter() {
 /** 路由白名单 */
 const whiteList = ["/login"];
 
-const { VITE_HIDE_HOME } = import.meta.env;
-
 router.beforeEach((to: toRouteType, _from, next) => {
   if (to.meta?.keepAlive) {
-    handleAliveRoute(to, "add");
+    const newMatched = to.matched;
+    handleAliveRoute(newMatched, "add");
     // 页面整体刷新和点击标签页刷新
     if (_from.name === undefined || _from.name === "Redirect") {
-      handleAliveRoute(to);
+      handleAliveRoute(newMatched);
     }
   }
   const userInfo = storageSession().getItem<DataInfo<number>>(sessionKey);
@@ -126,10 +124,6 @@ router.beforeEach((to: toRouteType, _from, next) => {
     if (to.meta?.roles && !isOneOfArray(to.meta?.roles, userInfo?.roles)) {
       next({ path: "/error/403" });
     }
-    // 开启隐藏首页后在浏览器地址栏手动输入首页welcome路由则跳转到404页面
-    if (VITE_HIDE_HOME === "true" && to.fullPath === "/welcome") {
-      next({ path: "/error/404" });
-    }
     if (_from?.name) {
       // name为超链接
       if (externalLink) {
@@ -151,7 +145,6 @@ router.beforeEach((to: toRouteType, _from, next) => {
               path,
               router.options.routes[0].children
             );
-            getTopMenu(true);
             // query、params模式路由传参数的标签页不在此处处理
             if (route && route.meta?.title) {
               useMultiTagsStoreHook().handleTags("push", {

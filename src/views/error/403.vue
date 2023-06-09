@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
 import noAccess from "@/assets/status/403.svg?component";
 
 defineOptions({
   name: "403"
 });
-
-const router = useRouter();
 </script>
 
 <template>
@@ -49,7 +46,7 @@ const router = useRouter();
       </p>
       <el-button
         type="primary"
-        @click="router.push('/')"
+        @click="$router.push('/')"
         v-motion
         :initial="{
           opacity: 0,
